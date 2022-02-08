@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const csvWriter = require('csv-write-stream');
 require('dotenv').config();
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const fetch = require('node-fetch');
 const User = require('./schema');
 const transporter = require('./lib/nodemailer');
@@ -26,11 +26,6 @@ const connectToMongo = async() => {
     return mongoose;
 };
 connectToMongo();
-
-jobDaily();
-workingDay();
-weekly();
-monthly();
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -141,4 +136,8 @@ app.post('/subscribe',async (req, res) => {
 app.listen(process.env.PORT || 8080, () => {
     console.log('Server started at');
     logger.info('Server started at');
+    jobDaily();
+    // workingDay();
+    // weekly();
+    // monthly();
 });
