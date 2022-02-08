@@ -26,7 +26,7 @@ const connectToMongo = async() => {
     return mongoose;
 };
 connectToMongo();
-
+/*
 var job = new CronJob(
     '1 * * * * *',
     function() {
@@ -110,7 +110,7 @@ var job = new CronJob(
 job.start()
 // Firebase config and initialization
 // Prod applications might use config file
-
+*/
 
 
 const transporter = nodemailer.createTransport({
@@ -169,7 +169,8 @@ app.post('/', (req, res) => {
 
 app.post( "/send", cors(), async ( req, res ) => {
     res.send( "Hello Email!" );
-    console.log('req.body.email', req.body.email);
+    console.log('req.body', req.body);
+    console.log('req.body.email', req.body.formEmail.email);
     const data = req.body.dataSCV;
     const writerExport = csvWriter({});
 
@@ -182,7 +183,7 @@ app.post( "/send", cors(), async ( req, res ) => {
     // send mail with defined transport object
     const info = await transporter.sendMail({
         from: '"Sender Name" <kolchinvolodumur@gmail.com>',
-        to: req.body.email,
+        to: req.body.formEmail.email,
         subject: "Hello from node",
         text: "Hello world?",
         html: "<strong>Hello world?</strong>",
