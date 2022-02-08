@@ -19,7 +19,7 @@ const User = mongoose.model("User", userScheme);
 const connectToMongo = async() => {
     await mongoose.connect(process.env.URL, { useUnifiedTopology: true, useNewUrlParser: true}, function(err){
         if(err) return console.log(err);
-        app.listen(8080, function(){
+        app.listen(process.env.PORT || 8080, function(){
             console.log("Server started at...");
         });
     });
