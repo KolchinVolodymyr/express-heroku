@@ -24,6 +24,14 @@ const userScheme = new Schema({
     unsubscribe: {
         type: Boolean,
         required: true
+    },
+    accessToken: {
+        type: String,
+        required: true
+    },
+    storeHash: {
+        type: String,
+        required: true
     }
 })
 
