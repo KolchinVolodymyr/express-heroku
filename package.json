@@ -31,6 +31,7 @@
     "mongodb": "^4.3.1",
     "mongoose": "^6.0.0-rc1",
     "node-fetch": "^2.6.6",
-    "nodemailer": "^6.7.2"
+    "nodemailer": "^6.7.2",
+    "winston": "^3.5.1"
   }
 }

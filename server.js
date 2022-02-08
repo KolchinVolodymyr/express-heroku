@@ -1,31 +1,40 @@
+'use strict';
 const express = require('express');
 const app = express();
-const nodemailer = require('nodemailer');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const csvWriter = require('csv-write-stream');
-const CronJob = require('cron').CronJob;
-const moment = require("moment");
 require('dotenv').config();
 const mongoose = require("mongoose");
 const fetch = require('node-fetch');
 const User = require('./schema');
 const transporter = require('./lib/nodemailer');
+const logger = require('./configs/logger');
+const jobDaily = require('./cron/job-daily');
+const workingDay = require('./cron/job-workingDay');
+const weekly = require('./cron/job-weekly');
+const monthly = require('./cron/job-monthly');
 
 const connectToMongo = async() => {
     await mongoose.connect(process.env.URL, { useUnifiedTopology: true, useNewUrlParser: true}, function(err){
-        if(err) return console.log(err);
+        if(err) {
+            logger.info(`Error(Connect mongodb): ${err}`);
+        }
     });
+    logger.info(`Mongoose connect`);
     return mongoose;
 };
 connectToMongo();
 
+jobDaily();
+workingDay();
+weekly();
+monthly();
+
 app.use(cors());
-//parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
-//parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
     res.send("Hello World!123");
@@ -61,12 +70,12 @@ app.post( "/send", cors(), async ( req, res ) => {
     console.log('req.body.email', req.body.formEmail.email);
     const data = req.body.dataSCV;
     const writerExport = csvWriter({});
-
     writerExport.pipe(fs.createWriteStream('BigCommerce-import-products.csv'));
     data.map((el)=>{
         writerExport.write(el);
     })
     writerExport.end();
+    logger.info(`Created file BigCommerce-import-products.csv`);
 
     // send mail with defined transport object
     const info = await transporter.sendMail({
@@ -82,7 +91,7 @@ app.post( "/send", cors(), async ( req, res ) => {
             }
         ]
     });
-    console.log("Message sent: %s", info.response);
+    logger.info(`Send mail: ${info.response}`);
 });
 
 app.post('/subscribe',async (req, res) => {
@@ -93,12 +102,15 @@ app.post('/subscribe',async (req, res) => {
     .then((data)=>{
         if(req.body.form.unsubscribe === true) {
             User.deleteMany({unsubscribe: true})
-                .then((res) => { console.log('res', res) })
-                .catch((err) => { console.log('error', err) })
+                .then((res) => {
+                    logger.info(`Delete user: ${req.body.form.email}`);
+                })
+                .catch((err) => {
+                    logger.info(`Error(Delete user): ${err}`);
+                })
             return;
         }
         if(data.length === 0) {
-            //User not found
             User.create({
                 email: req.body.form.email,
                 daily: req.body.form.daily,
@@ -108,19 +120,25 @@ app.post('/subscribe',async (req, res) => {
                 unsubscribe: req.body.form.unsubscribe,
             },
             function(err, doc){
-                if(err) return console.log(err);
-                console.log("Object saves user...", doc);
+                if(err) {
+                    return logger.info(`Error(Created user): ${err}`);
+                }
+                logger.info(`Created user: ${doc.email}`);
             });
         } else {
-            console.log('user found');
             User.updateOne({ email: req.body.form.email }, { $set: req.body.form } )
-            .then((res) => { console.log('res', res) })
-            .catch((err) => { console.log('error', err) })
+            .then((res) => {
+                logger.info(`Update user: ${req.body.form.email}`);
+            })
+            .catch((err) => {
+                logger.info(`Error(update users): ${err}`);
+            })
         }
     })
 });
 
 // start the Express server
 app.listen(process.env.PORT || 8080, () => {
-    console.log(`Server started at`);
+    console.log('Server started at');
+    logger.info('Server started at');
 });
