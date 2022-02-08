@@ -123,7 +123,7 @@ app.post( "/send", cors(), async ( req, res ) => {
 
 // const PORT = process.env.PORT || 8080;
 // // start the Express server
- app.listen(process.env.PORT || 8080, () => {
-     console.log( `server started at ${ PORT }` );
- });
+app.listen(process.env.PORT || 8080, () => {
+    console.log( `server started at ${ PORT }` );
+});
 
