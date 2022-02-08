@@ -9,38 +9,17 @@ const CronJob = require('cron').CronJob;
 const moment = require("moment");
 require('dotenv').config();
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 const fetch = require('node-fetch');
 const User = require('./schema');
-
-//const userScheme = new Schema({name: String, email: String, daily: Boolean, weekly: Boolean, context:String}, {versionKey: false});
-//const User = mongoose.model("User", userScheme);
+const transporter = require('./lib/nodemailer');
 
 const connectToMongo = async() => {
     await mongoose.connect(process.env.URL, { useUnifiedTopology: true, useNewUrlParser: true}, function(err){
         if(err) return console.log(err);
-//        app.listen(process.env.PORT || 8080, function(){
-//            console.log("Server started at...");
-//        });
     });
     return mongoose;
 };
 connectToMongo();
-
-
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp.elasticemail.com',
-    port: 2525,
-    secure: false,
-    requireTLS: true,
-    auth: {
-        user: 'kolchinvolodumur@gmail.com',
-        pass: '953C273D6C87057CD98FD08E305DDBFADFD0',
-    },
-    logger: true
-});
-
 
 app.use(cors());
 //parse application/x-www-form-urlencoded
@@ -72,18 +51,18 @@ app.post('/', (req, res) => {
     function(err, doc){
         // mongoose.disconnect();
         if(err) return console.log(err);
-        console.log("Сохранен объект user", doc);
+        console.log("Saves object user", doc);
     });
 });
 
 app.post( "/send", cors(), async ( req, res ) => {
-    res.send( "Hello Email!" );
+    res.send( "Hello Email! /send(POST)" );
     console.log('req.body', req.body);
     console.log('req.body.email', req.body.formEmail.email);
     const data = req.body.dataSCV;
     const writerExport = csvWriter({});
 
-    writerExport.pipe(fs.createWriteStream('file.csv'));
+    writerExport.pipe(fs.createWriteStream('BigCommerce-import-products.csv'));
     data.map((el)=>{
         writerExport.write(el);
     })
@@ -98,14 +77,6 @@ app.post( "/send", cors(), async ( req, res ) => {
         html: "<strong>Hello world?</strong>",
         headers: { 'x-myheader': 'test header' },
         attachments: [
-            {   // utf-8 string as an attachment
-                filename: 'text1.txt',
-                content: 'hello world!'
-            },
-            {   // binary buffer as an attachment
-                filename: 'text2.txt',
-                content: new Buffer('hello world!','utf-8')
-            },
             {
                 path: './file.csv'
             }
@@ -117,8 +88,15 @@ app.post( "/send", cors(), async ( req, res ) => {
 app.post('/subscribe',async (req, res) => {
     res.send("Hello World! Subscribe!!!");
     console.log('req.body', req.body);
+    // req.body.form.unsubscribe
     await User.find({email: req.body.form.email})
     .then((data)=>{
+        if(req.body.form.unsubscribe === true) {
+            User.deleteMany({unsubscribe: true})
+                .then((res) => { console.log('res', res) })
+                .catch((err) => { console.log('error', err) })
+            return;
+        }
         if(data.length === 0) {
             //User not found
             User.create({
@@ -137,29 +115,12 @@ app.post('/subscribe',async (req, res) => {
             console.log('user found');
             User.updateOne({ email: req.body.form.email }, { $set: req.body.form } )
             .then((res) => { console.log('res', res) })
-            .catch((err) => { console.log('error', error) })
+            .catch((err) => { console.log('error', err) })
         }
     })
-
-
-//    User.create({
-//        email: req.body.form.email,
-//        daily: req.body.form.daily,
-//        weekly: req.body.form.weekly,
-//        workingDay: req.body.form.workingDay,
-//        monthly: req.body.form.monthly,
-//        unsubscribe: req.body.form.unsubscribe,
-//    },
-//        function(err, doc){
-//                // mongoose.disconnect();
-//                if(err) return console.log(err);
-//                console.log("Object saves user...", doc);
-//        });
 });
 
-// const PORT = process.env.PORT || 8080;
-// // start the Express server
+// start the Express server
 app.listen(process.env.PORT || 8080, () => {
-    console.log( `server started at` );
+    console.log(`Server started at`);
 });
-
