@@ -11,10 +11,10 @@ require('dotenv').config();
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const fetch = require('node-fetch');
+const User = require('./schema');
 
-
-const userScheme = new Schema({name: String, email: String, daily: Boolean, weekly: Boolean, context:String}, {versionKey: false});
-const User = mongoose.model("User", userScheme);
+//const userScheme = new Schema({name: String, email: String, daily: Boolean, weekly: Boolean, context:String}, {versionKey: false});
+//const User = mongoose.model("User", userScheme);
 
 const connectToMongo = async() => {
     await mongoose.connect(process.env.URL, { useUnifiedTopology: true, useNewUrlParser: true}, function(err){
@@ -119,6 +119,50 @@ app.post( "/send", cors(), async ( req, res ) => {
         ]
     });
     console.log("Message sent: %s", info.response);
+});
+
+app.post('/subscribe',async (req, res) => {
+    res.send("Hello World! Subscribe!!!");
+    console.log('req.body', req.body);
+    await User.find({email: req.body.form.email})
+    .then((data)=>{
+        if(data.length === 0) {
+            //User not found
+            User.create({
+                email: req.body.form.email,
+                daily: req.body.form.daily,
+                weekly: req.body.form.weekly,
+                workingDay: req.body.form.workingDay,
+                monthly: req.body.form.monthly,
+                unsubscribe: req.body.form.unsubscribe,
+            },
+            function(err, doc){
+                if(err) return console.log(err);
+                console.log("Object saves user...", doc);
+            });
+        } else {
+            console.log('user found');
+            User.updateOne({ email: req.body.form.email }, { $set: req.body.form } )
+            .then((res) => { console.log('res', res) })
+            .catch((err) => { console.log('error', error) })
+
+        }
+    })
+
+
+//    User.create({
+//        email: req.body.form.email,
+//        daily: req.body.form.daily,
+//        weekly: req.body.form.weekly,
+//        workingDay: req.body.form.workingDay,
+//        monthly: req.body.form.monthly,
+//        unsubscribe: req.body.form.unsubscribe,
+//    },
+//        function(err, doc){
+//                // mongoose.disconnect();
+//                if(err) return console.log(err);
+//                console.log("Object saves user...", doc);
+//        });
 });
 
 // const PORT = process.env.PORT || 8080;
