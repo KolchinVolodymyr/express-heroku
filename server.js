@@ -50,18 +50,12 @@ app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
     res.send("Hello World!123");
-    // User.find({ $or: [ { weekly: true } ] }, function (err, docs) {
-    //     console.log('err', err);
-    //     docs.forEach((el)=> {
-    //         console.log('el', el);
-    //     })
-    // })
-    // User.find({email: 'KolchinVolo@gmail.com'}, function (err, docs) {
-    //     console.log('err', err);
-    //     docs.forEach((el)=> {
-    //         console.log('el', el);
-    //     })
-    // });
+    User.find({daily: true}).then((data)=>{
+        console.log('daily data', data);
+    })
+    User.find({workingDay: true}).then((data)=>{
+        console.log('workingDay data', data);
+    })
 });
 
 //test
@@ -75,12 +69,11 @@ app.post('/', (req, res) => {
         weekly: req.body.form.weekly,
         context: req.body.context
     },
-        function(err, doc){
-                // mongoose.disconnect();
-
-                if(err) return console.log(err);
-                console.log("Сохранен объект user", doc);
-        });
+    function(err, doc){
+        // mongoose.disconnect();
+        if(err) return console.log(err);
+        console.log("Сохранен объект user", doc);
+    });
 });
 
 app.post( "/send", cors(), async ( req, res ) => {
@@ -145,7 +138,6 @@ app.post('/subscribe',async (req, res) => {
             User.updateOne({ email: req.body.form.email }, { $set: req.body.form } )
             .then((res) => { console.log('res', res) })
             .catch((err) => { console.log('error', error) })
-
         }
     })
 
