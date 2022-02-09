@@ -32,6 +32,10 @@ const userScheme = new Schema({
     storeHash: {
         type: String,
         required: true
+    },
+    clientID: {
+        type: String,
+        required: true
     }
 })
 

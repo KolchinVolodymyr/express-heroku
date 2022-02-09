@@ -113,6 +113,8 @@ app.post('/subscribe',async (req, res) => {
                 workingDay: req.body.form.workingDay,
                 monthly: req.body.form.monthly,
                 unsubscribe: req.body.form.unsubscribe,
+                accessToken: req.body.accessToken,
+                storeHash: req.body.storeHash
             },
             function(err, doc){
                 if(err) {
