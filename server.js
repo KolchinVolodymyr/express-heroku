@@ -15,6 +15,7 @@ const jobDaily = require('./cron/job-daily');
 const workingDay = require('./cron/job-workingDay');
 const weekly = require('./cron/job-weekly');
 const monthly = require('./cron/job-monthly');
+const BigCommerce = require('node-bigcommerce');
 
 const connectToMongo = async() => {
     await mongoose.connect(process.env.URL, { useUnifiedTopology: true, useNewUrlParser: true}, function(err){
@@ -29,16 +30,20 @@ connectToMongo();
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 
 app.get('/', (req, res) => {
     res.send("Express heroku app");
-    User.find({daily: true}).then((data)=>{
-        console.log('daily data', data);
-    })
-    User.find({workingDay: true}).then((data)=>{
-        console.log('workingDay data', data);
-    })
+//    new BigCommerce({
+//        clientId: 'epsvve2tnfbs3s9p1fqpuclw6iyqvp3',
+//        accessToken: 'ssfaostmpc8hh6n7m5u3x6dvg9uha59',
+//        storeHash: '85kzbf18qd',
+//        responseType: 'json',
+//        apiVersion: 'v3' // Default is v2
+//    }).get('/catalog/products?include=variants')
+//     .then(async (data) => {
+//        console.log('data', data);
+//     })
 });
 
 app.post( "/send", cors(), async ( req, res ) => {
@@ -117,7 +122,7 @@ app.post('/subscribe',async (req, res) => {
 app.listen(process.env.PORT || 8080, () => {
     console.log('Server started at');
     logger.info('Server started at');
-    jobDaily();
+    // jobDaily();
     // workingDay();
     // weekly();
     // monthly();
