@@ -9,9 +9,8 @@ const User = require("../schema");
 const transporter = require("../lib/nodemailer");
 
 module.exports = function jobDaily () {
-//0 03 * * *
-//'40 2 * * *' в 2:40 по America/Los_Angeles
-    const job = new CronJob('40 2 * * *', async function() {
+    //'50 2 * * *' в 2:50 on America/Los_Angeles
+    const job = new CronJob('50 2 * * *', async function() {
         await User.find({daily: true})
             .then((response)=>{
                 const data = [];

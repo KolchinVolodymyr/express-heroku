@@ -34,16 +34,6 @@ app.use(bodyParser.json({limit: '50mb'}));
 
 app.get('/', (req, res) => {
     res.send("Express heroku app");
-//    new BigCommerce({
-//        clientId: 'epsvve2tnfbs3s9p1fqpuclw6iyqvp3',
-//        accessToken: 'ssfaostmpc8hh6n7m5u3x6dvg9uha59',
-//        storeHash: '85kzbf18qd',
-//        responseType: 'json',
-//        apiVersion: 'v3' // Default is v2
-//    }).get('/catalog/products?include=variants')
-//     .then(async (data) => {
-//        console.log('data', data);
-//     })
 });
 
 app.post( "/send", cors(), async ( req, res ) => {
@@ -58,20 +48,20 @@ app.post( "/send", cors(), async ( req, res ) => {
     logger.info(`Created file BigCommerce-import-products.csv`);
 
     // send mail with defined transport object
-    const info = await transporter.sendMail({
-        from: '"Admin BigCommerce" <kolchinvolodumur@gmail.com>',
-        to: req.body.formEmail.email,
-        subject: "BigCommerce import products",
-        text: "You can download the file.csv attached below.",
-        html: "<strong>You can download the file.csv attached below.</strong>",
-        headers: { 'x-myheader': 'test header' },
-        attachments: [
-            {
-                path: './file.csv'
-            }
-        ]
-    });
-    logger.info(`Send mail: ${info.response}`);
+   const info = await transporter.sendMail({
+       from: '"Admin BigCommerce" <kolchinvolodumur@gmail.com>',
+       to: req.body.formEmail.email,
+       subject: "BigCommerce import products",
+       text: "You can download the file.csv attached below.",
+       html: "<strong>You can download the file.csv attached below.</strong>",
+       headers: { 'x-myheader': 'test header' },
+       attachments: [
+           {
+               path: './file.csv'
+           }
+       ]
+   });
+   logger.info(`Send mail: ${info.response}`);
 });
 
 app.post('/subscribe',async (req, res) => {
@@ -122,8 +112,8 @@ app.post('/subscribe',async (req, res) => {
 app.listen(process.env.PORT || 8080, () => {
     console.log('Server started at');
     logger.info('Server started at');
-    // jobDaily();
-    // workingDay();
+    jobDaily();
+    workingDay();
     // weekly();
     // monthly();
 });
