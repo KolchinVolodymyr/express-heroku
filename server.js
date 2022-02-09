@@ -32,31 +32,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
-    res.send("Hello World!123");
+    res.send("Express heroku app");
     User.find({daily: true}).then((data)=>{
         console.log('daily data', data);
     })
     User.find({workingDay: true}).then((data)=>{
         console.log('workingDay data', data);
     })
-});
-
-//test
-app.post('/', (req, res) => {
-    res.send("Hello World!123");
-    console.log('req.body', req.body);
-    User.create({
-        name: "Tom",
-        email: req.body.form.email,
-        daily: req.body.form.daily,
-        weekly: req.body.form.weekly,
-        context: req.body.context
-    },
-    function(err, doc){
-        // mongoose.disconnect();
-        if(err) return console.log(err);
-        console.log("Saves object user", doc);
-    });
 });
 
 app.post( "/send", cors(), async ( req, res ) => {
@@ -72,11 +54,11 @@ app.post( "/send", cors(), async ( req, res ) => {
 
     // send mail with defined transport object
     const info = await transporter.sendMail({
-        from: '"Sender Name" <kolchinvolodumur@gmail.com>',
+        from: '"Admin BigCommerce" <kolchinvolodumur@gmail.com>',
         to: req.body.formEmail.email,
-        subject: "Hello from node",
-        text: "Hello world?",
-        html: "<strong>Hello world?</strong>",
+        subject: "BigCommerce import products",
+        text: "You can download the file.csv attached below.",
+        html: "<strong>You can download the file.csv attached below.</strong>",
         headers: { 'x-myheader': 'test header' },
         attachments: [
             {
@@ -135,7 +117,7 @@ app.post('/subscribe',async (req, res) => {
 app.listen(process.env.PORT || 8080, () => {
     console.log('Server started at');
     logger.info('Server started at');
-    // jobDaily();
+    jobDaily();
     // workingDay();
     // weekly();
     // monthly();
