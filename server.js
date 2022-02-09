@@ -114,7 +114,8 @@ app.post('/subscribe',async (req, res) => {
                 monthly: req.body.form.monthly,
                 unsubscribe: req.body.form.unsubscribe,
                 accessToken: req.body.accessToken,
-                storeHash: req.body.storeHash
+                storeHash: req.body.storeHash,
+                clientID: req.body.clientID
             },
             function(err, doc){
                 if(err) {
@@ -138,7 +139,7 @@ app.post('/subscribe',async (req, res) => {
 app.listen(process.env.PORT || 8080, () => {
     console.log('Server started at');
     logger.info('Server started at');
-    jobDaily();
+    // jobDaily();
     // workingDay();
     // weekly();
     // monthly();
