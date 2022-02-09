@@ -89,20 +89,8 @@ app.post( "/send", cors(), async ( req, res ) => {
 
 app.post('/subscribe',async (req, res) => {
     res.send("Hello World! Subscribe!!!");
-    // console.log('req.body', req.body);
-    // req.body.form.unsubscribe
     await User.find({email: req.body.form.email})
     .then((data)=>{
-        if(req.body.form.unsubscribe === true) {
-            User.deleteMany({unsubscribe: true})
-                .then((res) => {
-                    logger.info(`Delete user: ${req.body.form.email}`);
-                })
-                .catch((err) => {
-                    logger.info(`Error(Delete user): ${err}`);
-                })
-            return;
-        }
         if(data.length === 0) {
             User.create({
                 email: req.body.form.email,
@@ -122,13 +110,23 @@ app.post('/subscribe',async (req, res) => {
                 logger.info(`Created user: ${doc.email}`);
             });
         } else {
-            User.updateOne({ email: req.body.form.email }, { $set: req.body.form } )
-            .then((res) => {
-                logger.info(`Update user: ${req.body.form.email}`);
-            })
-            .catch((err) => {
-                logger.info(`Error(update users): ${err}`);
-            })
+            if(req.body.form.unsubscribe === true) {
+                User.deleteMany({ email: req.body.form.email })
+                    .then((res) => {
+                        logger.info(`Delete user: ${req.body.form.email}`);
+                    })
+                    .catch((err) => {
+                        logger.info(`Error(Delete user): ${err}`);
+                    })
+            } else {
+                User.updateOne({ email: req.body.form.email }, { $set: req.body.form } )
+                    .then((res) => {
+                        logger.info(`Update user: ${req.body.form.email}`);
+                    })
+                    .catch((err) => {
+                        logger.info(`Error(update users): ${err}`);
+                    })
+            }
         }
     })
 });
