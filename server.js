@@ -61,11 +61,9 @@ app.post('/', (req, res) => {
 
 app.post( "/send", cors(), async ( req, res ) => {
     res.send( "Hello Email! /send(POST)" );
-    console.log('req.body', req.body);
-    console.log('req.body.email', req.body.formEmail.email);
     const data = req.body.dataSCV;
     const writerExport = csvWriter({});
-    writerExport.pipe(fs.createWriteStream('BigCommerce-import-products.csv'));
+    writerExport.pipe(fs.createWriteStream('file.csv'));
     data.map((el)=>{
         writerExport.write(el);
     })
@@ -91,7 +89,7 @@ app.post( "/send", cors(), async ( req, res ) => {
 
 app.post('/subscribe',async (req, res) => {
     res.send("Hello World! Subscribe!!!");
-    console.log('req.body', req.body);
+    // console.log('req.body', req.body);
     // req.body.form.unsubscribe
     await User.find({email: req.body.form.email})
     .then((data)=>{
