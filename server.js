@@ -58,20 +58,20 @@ app.post( "/send", cors(), async ( req, res ) => {
     logger.info(`Created file BigCommerce-import-products.csv`);
 
     // send mail with defined transport object
-    const info = await transporter.sendMail({
-        from: '"Admin BigCommerce" <kolchinvolodumur@gmail.com>',
-        to: req.body.formEmail.email,
-        subject: "BigCommerce import products",
-        text: "You can download the file.csv attached below.",
-        html: "<strong>You can download the file.csv attached below.</strong>",
-        headers: { 'x-myheader': 'test header' },
-        attachments: [
-            {
-                path: './file.csv'
-            }
-        ]
-    });
-    logger.info(`Send mail: ${info.response}`);
+//    const info = await transporter.sendMail({
+//        from: '"Admin BigCommerce" <kolchinvolodumur@gmail.com>',
+//        to: req.body.formEmail.email,
+//        subject: "BigCommerce import products",
+//        text: "You can download the file.csv attached below.",
+//        html: "<strong>You can download the file.csv attached below.</strong>",
+//        headers: { 'x-myheader': 'test header' },
+//        attachments: [
+//            {
+//                path: './file.csv'
+//            }
+//        ]
+//    });
+//    logger.info(`Send mail: ${info.response}`);
 });
 
 app.post('/subscribe',async (req, res) => {
