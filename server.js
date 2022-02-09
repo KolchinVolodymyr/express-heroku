@@ -15,6 +15,7 @@ const jobDaily = require('./cron/job-daily');
 const workingDay = require('./cron/job-workingDay');
 const weekly = require('./cron/job-weekly');
 const monthly = require('./cron/job-monthly');
+const BigCommerce = require('node-bigcommerce');
 
 const connectToMongo = async() => {
     await mongoose.connect(process.env.URL, { useUnifiedTopology: true, useNewUrlParser: true}, function(err){
@@ -29,34 +30,20 @@ connectToMongo();
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 
 app.get('/', (req, res) => {
-    res.send("Hello World!123");
-    User.find({daily: true}).then((data)=>{
-        console.log('daily data', data);
-    })
-    User.find({workingDay: true}).then((data)=>{
-        console.log('workingDay data', data);
-    })
-});
-
-//test
-app.post('/', (req, res) => {
-    res.send("Hello World!123");
-    console.log('req.body', req.body);
-    User.create({
-        name: "Tom",
-        email: req.body.form.email,
-        daily: req.body.form.daily,
-        weekly: req.body.form.weekly,
-        context: req.body.context
-    },
-    function(err, doc){
-        // mongoose.disconnect();
-        if(err) return console.log(err);
-        console.log("Saves object user", doc);
-    });
+    res.send("Express heroku app");
+//    new BigCommerce({
+//        clientId: 'epsvve2tnfbs3s9p1fqpuclw6iyqvp3',
+//        accessToken: 'ssfaostmpc8hh6n7m5u3x6dvg9uha59',
+//        storeHash: '85kzbf18qd',
+//        responseType: 'json',
+//        apiVersion: 'v3' // Default is v2
+//    }).get('/catalog/products?include=variants')
+//     .then(async (data) => {
+//        console.log('data', data);
+//     })
 });
 
 app.post( "/send", cors(), async ( req, res ) => {
@@ -72,11 +59,11 @@ app.post( "/send", cors(), async ( req, res ) => {
 
     // send mail with defined transport object
     const info = await transporter.sendMail({
-        from: '"Sender Name" <kolchinvolodumur@gmail.com>',
+        from: '"Admin BigCommerce" <kolchinvolodumur@gmail.com>',
         to: req.body.formEmail.email,
-        subject: "Hello from node",
-        text: "Hello world?",
-        html: "<strong>Hello world?</strong>",
+        subject: "BigCommerce import products",
+        text: "You can download the file.csv attached below.",
+        html: "<strong>You can download the file.csv attached below.</strong>",
         headers: { 'x-myheader': 'test header' },
         attachments: [
             {
@@ -89,20 +76,8 @@ app.post( "/send", cors(), async ( req, res ) => {
 
 app.post('/subscribe',async (req, res) => {
     res.send("Hello World! Subscribe!!!");
-    // console.log('req.body', req.body);
-    // req.body.form.unsubscribe
     await User.find({email: req.body.form.email})
     .then((data)=>{
-        if(req.body.form.unsubscribe === true) {
-            User.deleteMany({unsubscribe: true})
-                .then((res) => {
-                    logger.info(`Delete user: ${req.body.form.email}`);
-                })
-                .catch((err) => {
-                    logger.info(`Error(Delete user): ${err}`);
-                })
-            return;
-        }
         if(data.length === 0) {
             User.create({
                 email: req.body.form.email,
@@ -122,13 +97,23 @@ app.post('/subscribe',async (req, res) => {
                 logger.info(`Created user: ${doc.email}`);
             });
         } else {
-            User.updateOne({ email: req.body.form.email }, { $set: req.body.form } )
-            .then((res) => {
-                logger.info(`Update user: ${req.body.form.email}`);
-            })
-            .catch((err) => {
-                logger.info(`Error(update users): ${err}`);
-            })
+            if(req.body.form.unsubscribe === true) {
+                User.deleteMany({ email: req.body.form.email })
+                    .then((res) => {
+                        logger.info(`Delete user: ${req.body.form.email}`);
+                    })
+                    .catch((err) => {
+                        logger.info(`Error(Delete user): ${err}`);
+                    })
+            } else {
+                User.updateOne({ email: req.body.form.email }, { $set: req.body.form } )
+                    .then((res) => {
+                        logger.info(`Update user: ${req.body.form.email}`);
+                    })
+                    .catch((err) => {
+                        logger.info(`Error(update users): ${err}`);
+                    })
+            }
         }
     })
 });
