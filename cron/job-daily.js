@@ -10,7 +10,7 @@ const transporter = require("../lib/nodemailer");
 
 module.exports = function jobDaily () {
     //'50 2 * * *' в 2:50 on America/Los_Angeles
-    const job = new CronJob('50 2 * * *', async function() {
+    const job = new CronJob('10 3 * * *', async function() {
         await User.find({daily: true})
             .then((response)=>{
                 const data = [];
