@@ -42,7 +42,7 @@ module.exports = function workingDay () {
                             logger.info(`Created file BigCommerce-import-products.csv`);
                             // send mail with defined transport object
                             const info = await transporter.sendMail({
-                                from: '"Admin BigCommerce" <kolchinvolodumur@gmail.com>',
+                                from: 'StockAssistant@friendsofcommerce.com',
                                 to: element.email,
                                 subject: "BigCommerce import products (working day)",
                                 text: "You can download the file.csv attached below.",

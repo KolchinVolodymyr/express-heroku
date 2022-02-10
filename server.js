@@ -49,7 +49,7 @@ app.post( "/send", cors(), async ( req, res ) => {
 
     // send mail with defined transport object
    const info = await transporter.sendMail({
-       from: '"Admin BigCommerce" <kolchinvolodumur@gmail.com>',
+       from: 'StockAssistant@friendsofcommerce.com',
        to: req.body.formEmail.email,
        subject: "BigCommerce import products",
        text: "You can download the file.csv attached below.",
